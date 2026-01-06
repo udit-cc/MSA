@@ -1,0 +1,57 @@
+Go to the command prompt and navigate to the folder to where you want to store application files. Enter the following command: mkdir practical2 Then go to visual studio and create a project practical 2
+
+asp.net core web app model view controller
+
+Right on model and add a new item and enter the following code. Save the file as ‘StockQuote.cs’ in the Models folder of the project.
+
+namespace Practical_2.Models
+{
+public class StockQuote
+{
+public string Symbol { get; set; } = default!; public int Price { get; set; } = default!;
+}
+}
+
+Go to Views folder → Open Home folder → Open Index.cshtml file and replace the existing code with the following:
+@{
+ViewData["Title"] = "Home Page";
+}
+<html>
+<head>
+<title>Hello World</title>
+</head>
+<body>
+<h1>Hello World</h1>
+<div>
+<h2>StockQuote</h2>
+<div>
+Symbol: @Model.Symbol<br /> Price: $@Model.Price<br />
+</div>
+</div>
+</body>
+</html>
+
+Go to Controllers folder → Open HomeController.cs file and replace the existing code with the following:
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Practical_2.Models;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+namespace Practical_2.Controllers;
+public class HomeController : Controller
+{
+public async Task<IActionResult> Index()
+{
+var model = new StockQuote
+{
+Symbol = "Nike",
+Price = 3200
+}; await Task.Delay(0); return View(model);
+}
+}
+
+
+Run the code

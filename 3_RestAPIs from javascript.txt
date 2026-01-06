@@ -1,0 +1,72 @@
+● Create new project using the below given template.
+practical 3
+
+● Go to Views folder  Open Home folder Open Index.cshtml file and replace the existing code
+with the following:
+<!DOCTYPE html>
+<html>
+<head>
+<title>Invoke API</title>
+<script>
+async function fetchData() {
+try {
+const response = await fetch(‘/api/data’);
+if (!response.ok) {
+throw new Error(‘Network response was not ok’);
+}
+const data = await response.json();
+document.getElementById(‘output’).innerText = JSON.stringify(data, null, 2);
+} catch (error) {
+console.error(‘Error fetching data:’, error);
+document.getElementById(‘output’).innerText = ‘Error fetching data.’;
+}
+}
+</script>
+</head>
+<body>
+<h1>Fetch Data from API</h1>
+<button onclick=”fetchData()”>Fetch API Data</button>
+<pre id=”output”></pre>
+</body>
+</html>
+
+● Go to Controllers folder Open HomeController.cs file and replace the existing code with the following:
+
+using Microsoft.AspNetCore.Mvc;
+namespace MvcApp.Controllers
+{
+public class HomeController : Controller
+{
+public IactionResult Index()
+{
+return View();
+}
+}
+}
+
+● Creating an API: Right click on project AddNew Items. Create a new file named
+‘ApiController.cs’ in the Controller folder with the following code
+
+using Microsoft.AspNetCore.Mvc;
+namespace MvcApp.Controllers
+{
+[Route(“api/[controller]”)]
+[ApiController]
+public class ApiController : ControllerBase
+{
+[HttpGet(“data”)]
+public IactionResult GetData()
+{
+var response = new
+{
+Message = “Hello from the API!”,
+Timestamp = System.DateTime.UtcNow
+};
+return Ok(response);
+}
+}
+}
+
+● Save and Run the code
+
+● OR Use the url of the command prompt in the browser and see the output

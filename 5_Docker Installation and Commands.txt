@@ -1,0 +1,39 @@
+Step 1: Open The Windows Features On Or Tick the
+ Virtual machine Platform and
+ Windows Subsystem For Linux
+ Windows Hypervisor Platform
+Step 2: Install WSL
+ Open PowerShell or Windows Command Prompt in administrator mode.
+ Enter the ‘wsl’ command. WSL stands for Windows Subsystem for Linux.
+ And Then Close the Power Shall Open new Power shell
+Step 3: To install Linux distributions, use the command: ‘wsl --install -d ’.
+ The command is – ‘wsl --install -d Ubuntu-24.04’
+ To see a list of available Linux distributions available for download through the online store, enter:
+‘wsl -l -o’
+
+Step 4: After successful installation of the Linux distribution, the following window will appear. Set
+username and password for the Windows Subsystem for Linux.
+Note: The password will not be visible when you enter it.
+Step 5: Installation of Docker Desktop
+ Download Docker Desktop using the following link:
+https://www.docker.com/products/docker-desktop/
+ Run the docker installation exe as administrator.
+Step 6: Select the checkbox on the configuration window.
+After installation, run Docker Desktop. Accept the terms and conditions.
+Step 7: Verify whether Docker installation is successful.
+
+ Go to Command Prompt and enter: docker
+
+ To check version of Docker, enter the following command: docker –version
+
+Step 8: Publishing an existing image into Docker container
+ To publish an existing docker ‘hello world’ image into a docker container, use: docker run -p 8080:8080 dotnetcoreservices/hello-world
+
+ Copy the URL from the above output and paste it in any browser. Change the IP address in the URLto ‘127.0.0.1’.
+
+ Also if you go to Docker Desktop ,in the Images tab, you will see that the hello-world image hasbeen published in the container.
+
+Step 9: Basic Docker commands
+ To list all containers, use: docker ps
+ To delete or kill a Docker container use: docker kill
+ To verify deletion use: docker ps

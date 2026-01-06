@@ -1,0 +1,68 @@
+Step 1: Open Command Prompt and navigate to the path where you would like to create your Application
+Step 2: Create a new folder named “Practical7” using the command: mkdir Practical7
+Step 3: Navigate to this folder
+Step 4: In this path Enter the following command to create the dotnet application : dotnet new console -o App -n DotNet.Docker
+Step 5: You can see all the files necessary for the Application have been created in the specified location
+Step 6: Now navigate to the “App” folder where all these files have been created ,remember we will be
+running all the commands within this path only.
+Step 7: Run the application using command: ‘dotnet run’ you can see the output :
+Step 8: Now go to the path where our dotnet application was created & get inside the “App” folder and open Program.cs file in Notepad
+Step 9: Replace any existing code in this file with the following code, This code counts numbers every second :
+
+var counter = 0;
+var max = args.Length is not 0 ? Convert.ToInt32(args[0]) : -1;
+while (max is -1 || counter < max)
+{
+Console.WriteLine($"Counter: {++counter}");
+await Task.Delay(TimeSpan.FromMilliseconds(1_000));
+}
+
+Step 10: Save the file and run the application in command prompt using ‘dotnet run’. This app runs
+indefinitely so use cancel command Ctrl+C to stop it.
+
+Step 11: If you pass a number on the command line to the app, it will only count up to that amount and then
+exit. For example: ‘dotnet run -- 3’
+
+Step 12: Before adding the .NET app to the Docker image, first it must be published. To publish the app, run
+the following command: ‘dotnet publish -c Release’
+
+Step 13: This command compiles your app to the publish folder. The path to the publish folder from the
+working folder will be ".\App\bin\Release\net10.0\publish\".
+
+Step 14: Open Notepad → Create a New file and write the following code in it :
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-env
+WORKDIR /App
+# Copy everything
+COPY . ./
+# Restore as distinct layers
+RUN dotnet restore
+# Build and publish a release
+RUN dotnet publish -c Release -o out
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+WORKDIR /App
+COPY --from=build-env /App/out .
+ENTRYPOINT ["dotnet", "DotNet.Docker.dll"]
+
+Step 15: Save this file by naming it “Dockerfile”. This file should be saved in the same directory where the
+DotNet.Docker.csproj file is saved i.e., in the App folder.
+Step 16: Start Docker Desktop , then go back to command prompt and run the following command in our
+Application Root Folder to build the ‘counter-image’ (make sure you add dot at the end of this command):
+‘ docker build -t counter-image -f Dockerfile . ’
+
+Step 17: Run ‘docker images’ to see a list of images installed.
+
+Step 18: Also, if you check Images in Docker Desktop you will see the newly created image.
+
+Step 19: Create a container named ‘core-counter’ using the following command: docker create --name core-counter counter-image
+
+Step 20: To see a list of all containers, use the ‘docker ps -a’ command.
+
+Step 21: Start the ‘core-counter’ container using following command: ‘docker start core-counter’.
+
+Step 22: You can check using ‘docker ps’ command that the container is running
+
+Step 23: Check the output in Docker Desktop → Containers → core-counter → Logs.
+
+Step 24: To stop the code, enter ‘docker stop core-counter’ in the command prompt.

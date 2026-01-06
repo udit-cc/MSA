@@ -1,0 +1,56 @@
+Important Note : Remember we will be using the Account credentials of Docker Desktop only while logging in for both Docker Playground and Docker Hub.
+Note : Docker Playground is a cloud-based tool that allows you to experiment with Docker containers in a web browser without the need to rely on Docker Desktop. It behaves just like a Docker installation on your local machine.
+Step 2: In Your Docker Desktop go to Account Settings , it will take you to webpage, sign in with the same credentials of your Docker Desktop.
+Step 3: Go to Account Settings. Reset your password (or Set it if it’s for first time)
+Note: Remember this password, it will be used later in Docker playground
+Step 4: Now to use Docker Playground go to https://labs.play-with-docker.com/, login with your Docker Desktop Credentials. Click on Start button.
+Step 5:
+• Click on Add New Instance. You will see the editor open in the right pane.
+
+192.168.0.14
+• Commands will be given in the black terminal or console.
+• To check the version of the docker type the command: docker –version
+• To pull the ready made image type the command: docker pull hello-world
+• To check the images in docker type the command : docker images
+
+Step 6 :
+Part 1: To pull and Push images in docker:
+• Open the new tab in the browser and go to https://hub.docker.com/ , sign in with your Docker Desktop account.
+• Click on Repositories tab and then click on Create Repositories
+• Give any name to your repository and in description add “My first repository”. Also Make visibility as Private , click on create , the repository will be created.
+Now come back to Docker Playground and give following command to login to your Docker Account :
+docker login -u <username>
+• Put your username above , you will find username in your docker desktop’s Account Panel
+• You will be prompted to enter a password , now enter the password which you created in Account Settings at the beginning
+
+Note: The password won’t be visible while you enter it, so continue entering it.
+
+• To see earlier pulled image and its image id enter the command : docker images
+• To tag that image in docker type command:
+docker tag <image_id> <username>/<name_of_your_repository>:firsttry
+
+• Put the image id of the image , your username and the name of your repository which you created in Docker Hub, firsttry is the tag name which we have assigned to the image.
+
+• To push the image to your docker hub use command ( put your username ):
+docker push <username>/<name_of_your_repository>:firsttry
+
+Step 7 :
+Part 2: Build an image and then push and run in the docker :
+• Create a new repository again in Docker Hub, give it a name and description.
+
+• In Docker Playground type command :
+cat>Dockerfile<<EOF
+From busybox
+CMD echo "Hello world"
+EOF
+
+• To build the image from docker file use command:
+docker build -t <username>/<repository_name>:latest.
+• Give your username and the repository name which you just created above , latest is the tag name here
+• To check if the image has been built or not use command : docker images
+• To push this newly created image to your docker hub use command ( put your username ):
+docker push <username>/<name_of_your_repository>:latest
+• Go back to Docker Hub you can see the image has been pushed into your repository
+• Now to run the docker image run the command in Docker playground :
+docker run<username>/<repository_name>
+• You can see the output. Close the session

@@ -1,0 +1,203 @@
+Steps:
+ Open Visual Studio Community 2026
+ Click on Create a new Project
+ Search for Blank Solution, select it, and click Next
+
+ Set the name as MicroservicesDemo and click Create
+ Right-click the MicroservicesDemo solution in Solution Explorer
+ Select Add → New Project.
+ Search for ASP.NET Core Web API, select it, and click Next.
+ Set the name as ProductService, then click Next.
+ Choose .NET 8.0 (Long Term Support), and click Create.
+ Right-click the MicroservicesDemo solution again.
+ Select Add → New Project.
+ Search for ASP.NET Core Web API, select it, and click Next.
+ Name it OrderService, then click Next.
+
+ Choose .NET 8.0 (Long Term Support), and click Create.
+ Your Solution Explorer should now have:
+➢ MicroservicesDemo (Solution)
+1) ProductService (ASP.NET Core Web API)
+2) OrderService (ASP.NET Core Web API)
+ You can delete the WeatherForecast.cs file from the OrderService and ProductService project folders, as well as the WeatherForecastController.cs file from the Controllers folder of both projects, since these files are included by default.
+
+ In ProductService, right-click the Models folder (create one if needed).
+ Click Add → Class.
+ Name it Product.cs and replace any existing code in it with the following code & save it:
+
+namespace ProductService.Models
+{
+public class Product
+{
+public int Id { get; set; }
+public string Name { get; set; } = string.Empty;
+public decimal Price { get; set; }
+}
+}
+
+ In ProductService, go to the Controllers folder.
+ Right-click and select Add → Controller.
+ Select API Controller - Empty, name it ProductsController.
+ Replace the existing code in it with the below code and save it :
+
+using Microsoft.AspNetCore.Mvc;
+using ProductService.Models;
+namespace ProductService.Controllers
+{
+[ApiController]
+[Route("api/[controller]")]
+public class ProductsController : ControllerBase
+{
+private static readonly List<Product> Products = new()
+{
+new() { Id = 1, Name = "Laptop", Price = 50000 },
+new() { Id = 2, Name = "Phone", Price = 20000 },
+new() { Id = 3, Name = "Tablet", Price = 15000 }
+};
+[HttpGet]
+public IActionResult GetAllProducts() => Ok(Products);
+[HttpGet("{id}")]
+public IActionResult GetProductById(int id)
+{
+var product = Products.FirstOrDefault(p => p.Id == id);
+return product == null ? NotFound() : Ok(product);
+}
+}
+}
+
+ Open Program.cs in ProductService.
+ Replace the code in it with the following code and save it:
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add controller and Swagger support
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+var app = builder.Build();
+// Show Swagger only in development mode
+if (app.Environment.IsDevelopment())
+{
+app.UseSwagger();
+app.UseSwaggerUI();
+}
+// Map controller routes and run the app
+app.MapControllers();
+app.Run();
+
+ In OrderService, right-click the Models folder (create one if needed).
+ Click Add → Class.
+ Name it Order.cs and replace any existing code in it with the following code & save it:
+
+namespace OrderService.Models
+{
+public class Order
+{
+public int OrderId { get; set; } // Unique ID for the order
+public int ProductId { get; set; } // ID of the product being ordered
+public string ProductName { get; set; } = string.Empty; // Name of the product
+public decimal Price { get; set; } // Price of the product
+}
+}
+
+ In OrderService, go to the Controllers folder.
+ Right-click and select Add → Controller.
+ Choose API Controller - Empty, name it OrdersController.
+
+using Microsoft.AspNetCore.Mvc;
+using OrderService.Models;
+using System.Net.Http.Json;
+
+namespace OrderService.Controllers
+{
+[ApiController]
+[Route("api/[controller]")]
+public class OrdersController : ControllerBase
+{
+private readonly HttpClient _httpClient;
+// Constructor: Gets an HttpClient from the factory
+public OrdersController(IHttpClientFactory httpClientFactory)
+{
+_httpClient = httpClientFactory.CreateClient("ProductService");
+}
+// POST: api/orders/{productId}
+[HttpPost("{productId}")]
+public async Task<IActionResult> CreateOrder(int productId)
+{
+// Get product details from another microservice (ProductService)
+var product = await
+_httpClient.GetFromJsonAsync<ProductDto>($"/api/products/{productId}");
+if (product == null)
+return NotFound("Product not found");
+// Create a new order using the product info
+var order = new Order
+{
+OrderId = new Random().Next(1000, 9999),
+ProductId = product.Id,
+ProductName = product.Name,
+Price = product.Price
+};
+return Ok(order); // Return the created order
+}
+}
+// Product model used to receive data from ProductService
+public class ProductDto
+{
+public int Id { get; set; }
+public string Name { get; set; } = string.Empty;
+public decimal Price { get; set; }
+}
+}
+
+ Now go to launchSettings.json file in project folder ProductService
+
+ Note down the URL and Port under the object http of profiles list
+
+ Open Program.cs in OrderService.
+ Replace the code in it with the following code , and most importantly put the above noted URL in
+client.BaseAddress = new Uri(“ ”); part of the code and save it:
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Register an HttpClient named "ProductService"
+builder.Services.AddHttpClient("ProductService", client =>
+{
+client.BaseAddress = new Uri("http://localhost:5166"); // ProductService API base URL
+});
+// Add controller and Swagger support
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+var app = builder.Build();
+// Enable Swagger only in Development
+if (app.Environment.IsDevelopment())
+{
+app.UseSwagger();
+app.UseSwaggerUI();
+}
+// Map controllers and start the app
+app.MapControllers();
+app.Run();
+
+
+ Now right click on your Solution MicroservicesDemounder Solution Explorer and go to “Configure
+Startup Projects”
+ Select Multiple Startup Projects and select the options as below, apply the settings and click OK :
+
+ Now start running the application
+ Two Browser windows will open one for the OrderService and other for ProductService
+
+ For ProductService :
+The API should be accessible at:
+➢ GET /api/Products → Retrieve all Products.
+➢ GET /api/Products/{id} → Retrieve a Product by ID.
+ For example click on GET /api/Products dropdown ,click on try it out and then execute , a request URL will be displayed.
+
+ Search this URL in browser you can see the output ,similarly you can check for GET
+/api/Products/{id} also.
+localhost:5166/api/Products/
+
+ For OrderSevice : The API should be accessible at:
+➢ GET /api/Orders/{productId} → Retrieve an order by Product ID.
+ For this you can check the output in terminal using the command (for Product ID -1):
+curl -X POST http://localhost:5275/api/orders/1

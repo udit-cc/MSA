@@ -1,0 +1,109 @@
+Step 1: Open Command Prompt and navigate to the path where you would like to create your Application
+Step 2: Create a new folder named “Practical8” using the command: mkdir Practical8
+Step 3: Navigate to this folder
+Step 4: Now navigate to the “AspNetConsoleApp” folder where all these files have been created ,remember
+we will be running all the commands in this path only.
+Step 5: In this path Enter the following command to create the dotnet application : dotnet new console -o
+AspNetConsoleApp
+Step 6: You can see all the files necessary for the Application have been created in the specified location
+Step 7: Run the following commands to install the necessary ASP.NET Core NuGet packages:
+ Install Microsoft.AspNetCore.App (if it’s not already included):
+dotnet add package Microsoft.AspNetCore.App --version 2.2.8
+ Install Microsoft.AspNetCore.Hosting (if not already included):
+dotnet add package Microsoft.AspNetCore.Hosting
+Step 8: Go to the path where our dotnet application was created & get inside the “AspNetConsoleApp”
+folder and open AspNetConsoleApp.csproj in Notepad
+Step 9: Replace any existing code in this file with the following code and save the file:
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup>
+<OutputType>Exe</OutputType>
+<TargetFramework>net9.0</TargetFramework>
+<ImplicitUsings>enable</ImplicitUsings>
+<Nullable>enable</Nullable>
+</PropertyGroup>
+<ItemGroup>
+<PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />
+<PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.0" />
+</ItemGroup>
+</Project>
+
+Step 10: Now go to the path where our dotnet application was created & get inside the
+“AspNetConsoleApp” folder and open Program.cs file in Notepad
+
+Step 11: Replace any existing code in this file with the following code and save the file . This code starts a minimal web server that responds with a simple message.:
+
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+// Route: responds with a simple message
+app.MapGet("/", () => "Hello from Docker Swarm with ASP.NET Core!");
+// Listen on all network interfaces and port 5000
+app.Run("http://0.0.0.0:5000");
+
+Step 12: Open Notepad → Create a New file and write the following code in it :
+
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /app
+COPY . ./
+RUN dotnet publish -c Release -o out
+# Use the runtime image for the final stage
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/out ./
+EXPOSE 5000
+ENTRYPOINT ["dotnet", "AspNetConsoleApp.dll"]
+
+
+Step 13: Save this file by naming it “Dockerfile”. This file should be saved in the AspNetConsoleApp
+folder.
+Note: Dockerfile is a text file that doesn't have any extension. While saving the file, use double inverted
+quotes - “Dockerfile” - and it will be saved as a file as shown below. If not saved in file format refer below
+screenshot.
+
+Step 14: Start Docker Desktop , then go back to command prompt and run the following command in our
+Application Root Folder to build the Docker image (make sure you add dot at the end of this command) :
+docker build -t aspnet-console-swarm:latest .
+
+Step 15: Verify the image creation using : “ docker images ”
+
+Step 16: Now Initialize Docker Swarm (if not already initialized) using command : “ docker swarm init ”
+
+Step 17: Create a Docker Compose File (Optional but Recommended) :
+In the root directory open notepad and write the following code :
+
+version: "3.8"
+
+services:
+aspnetapp:
+image: aspnet-console-swarm:latest
+ports:
+- "5000:5000"
+deploy:
+replicas: 3
+resources:
+limits:
+cpus: "0.50"
+memory: "256M"
+restart_policy:
+condition: on-failure
+
+Step 18: Save the file by the name : docker-compose.yml.
+
+Step 19: Deploy the application to swarm using command : docker stack deploy -c docker-compose.yml aspnetstack
+
+Step 20: Verify that the services are running using: docker service ls
+
+And If you are getting error or can’t see all 3 replicas try the following command : docker stack
+deploy -c docker-compose.yml swarmstack
+Step 21: Check the running containers using : docker ps
+
+Step 22: Now, test the app using : curl http://localhost:5000
+
+Step 23: Open in Browser Go to : http://localhost:5000
+Final Output:
+
+Step 24: Clean Up : Remove the deployed stack using: docker stack rm aspnetstack
+
+Step 25: Leave the Swarm (if no longer needed) using : docker swarm leave –f

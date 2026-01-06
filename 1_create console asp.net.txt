@@ -1,0 +1,68 @@
+Download asp.net core from https://dotnet.microsoft.com/en-us/download
+● Install the downloaded file
+● To verify installation, open command prompt and enter ‘dotnet’.
+● To check dotnet version enter command : dotnet -–version
+
+Create a directory where you want to store all the files
+mkdir MSA
+cd MSA
+● Create a new dotnet console using command : dotnet new console
+● To restore dotnet enter command : dotnet restore
+● To run dotnet enter command : dotnet run
+Open the file location. you will find msa.csproj, open that C# file
+open program.cs file, code will be there
+
+● Install the following packages using command : dotnet add package package_name -v version_number
+1. Microsoft.AspNetCore.Mvc
+2. Microsoft.AspNetCore.Server.Kestrel
+3. Microsoft.Extensions.Logging
+4. Microsoft.Extensions.Logging.Console
+5. Microsoft.Extensions.Logging.Debug
+6. Microsoft.Extensions.Configuration.CommandLine
+
+● The installed packages will be reflected automatically in the MSA.csproj file.
+● Use ‘dotnet restore’ to restore
+Open Program.cs and enter the following code. 
+using System;
+using Microsoft.AspNetCore.Builder; 
+using Microsoft.AspNetCore.Hosting; 
+using Microsoft.Extensions.Logging; 
+using Microsoft.Extensions.Configuration; 
+using Microsoft.AspNetCore.Http;
+namespace helloworld
+{
+internal class Program
+{
+static void Main(string[] args)
+{
+var config = new ConfigurationBuilder()
+	.AddCommandLine(args)
+	.Build();
+
+var host = new WebHostBuilder()
+	.UseKestrel()
+	.UseStartup<Startup>()
+	.UseUrls("http://localhost:5200/")
+	.UseConfiguration(config)
+	.Build();
+
+host.Run();
+}
+}
+public class Startup
+{
+public Startup(IHostingEnvironment env) { }
+public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+{
+app.Run(async (context) =>
+{
+await context.Response.WriteAsync("Hello, world!");
+
+});
+}
+}
+}
+
+Use ‘dotnet restore’ to restore
+Use ‘dotnet run’ to run
+Copy the URL and open it in any browser
